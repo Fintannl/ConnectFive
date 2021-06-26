@@ -7,5 +7,5 @@ public class GlobalConstants {
 	  static final int PLAYER2_WON= 4;// Indicate player 2 won
 	  static final int DRAW=5; // Indicate a draw
 	  static final int CONTINUE=6; // Indicate to continue
-	  static final int INPUT_PORT=1234; // port
+	  public static final int INPUT_PORT=1234; // port
 }

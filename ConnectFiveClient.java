@@ -24,7 +24,7 @@ public class ConnectFiveClient implements Runnable {
 	private String host = "localhost";
 	private String currentPlayerName = "";
 
-	void connectToServer() {
+	public void connectToServer() {
 
 		try {
 			socket = new Socket(host, GlobalConstants.INPUT_PORT);
@@ -38,45 +38,31 @@ public class ConnectFiveClient implements Runnable {
 		Thread thread = new Thread(this);
 		thread.start();
 	}
+    public int sendMessage(int n) throws IOException {
+        toServer.writeInt(n);
+        int resp = fromServer.readInt();
+        return resp;
+    }
+    
+    public void closeConnection() throws IOException {
+    	fromServer.close();
+    	toServer.close(); 	
+    }
 
 	public void run() {
 		try {
 			player = fromServer.readInt();
-
-			if (player == GlobalConstants.PLAYER1) {
-				myToken = 'X';
-				otherToken = 'O';
-				try (Scanner input = new Scanner(System.in)) {
-					System.out.println("Hello Player1, Please enter your name");
-					player1Name = input.nextLine();
-					System.out.println("Welcome :" + player1Name + ", Waiting for player 2 to join");
-				}
-				fromServer.readInt(); // waiting for the other player to join
-				myTurn = true;
-			} else if (player == GlobalConstants.PLAYER2) {
-				myToken = 'O';
-				otherToken = 'X';
-				try (Scanner input = new Scanner(System.in)) {
-					System.out.println("Hello Player2, Please enter your name");
-					player2Name = input.nextLine();
-					System.out.println(player2Name + ", has joined the game");
-				}
-
-			}
-
+			enterPlayerName();
 			while (continueToPlay) {
 				if (player == GlobalConstants.PLAYER1) {
 					currentPlayerName = player1Name;
-				} else {
-					currentPlayerName = player2Name;
-				}
-				if (player == GlobalConstants.PLAYER1) {
 					refresh();
 					enterColumn();
 					playerMoveCheck(columnSelected);
 					sendMove();
 					receiveInfoFromServer();
 				} else {
+					currentPlayerName = player2Name;
 					receiveInfoFromServer();
 					refresh();
 					enterColumn();
@@ -85,7 +71,38 @@ public class ConnectFiveClient implements Runnable {
 				}
 			}
 		} catch (Exception ex) {
+			ex.printStackTrace();
+			
+			
 		}
+	}
+
+	public void enterPlayerName() {
+		if (player == GlobalConstants.PLAYER1) {
+			myToken = 'X';
+			otherToken = 'O';
+			try (Scanner input = new Scanner(System.in)) {
+				System.out.println("Hello Player1, Please enter your name");
+				player1Name = input.nextLine();
+				System.out.println("Welcome :" + player1Name + ", Waiting for player 2 to join");
+			}
+			try {
+				fromServer.readInt();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} // waiting for the other player to join
+			myTurn = true;
+		} else if (player == GlobalConstants.PLAYER2) {
+			myToken = 'O';
+			otherToken = 'X';
+			try (Scanner input = new Scanner(System.in)) {
+				System.out.println("Hello Player2, Please enter your name");
+				player2Name = input.nextLine();
+				System.out.println(player2Name + ", has joined the game");
+			}
+
+		}
+
 	}
 
 	public void refresh() throws IOException {
@@ -109,7 +126,7 @@ public class ConnectFiveClient implements Runnable {
 			if (columnSelected < 1 || columnSelected > 9) {
 				System.out.println("Invalid Value, please try again");
 				System.out.print("It’s your turn " + currentPlayerName + ", please enter column (1-9):");
-				columnSelected = scan.nextInt();			
+				columnSelected = scan.nextInt();
 			}
 		}
 	}

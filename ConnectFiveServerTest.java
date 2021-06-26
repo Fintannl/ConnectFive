@@ -1,22 +1,22 @@
+package com.fintan.connectfivetest;
 
-package com.fintan.connectfive;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import static org.junit.Assert.*;
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 
 import org.junit.Test;
+
+import com.fintan.connectfive.ConnectFiveServer;
+import com.fintan.connectfive.GlobalConstants;
+
+
 public class ConnectFiveServerTest {
-
-
-
 	@Test
 	  public void serverAcceptsConnection() throws IOException {
-		ConnectFiveServer.listen(1234); // creates the `serverSocket`
+	    ConnectFiveServer.listen(GlobalConstants.INPUT_PORT); // creates the `serverSocket`
 
 	    // create a `clientSocket` that will try to connect to a serverSocket
 	    // that has the hostname 'localhost'
@@ -29,7 +29,8 @@ public class ConnectFiveServerTest {
 	    } catch (Exception e) {
 	      System.out.println(e.getMessage());
 	    }
-
+	    // close the 'serverSocket'
+	    ConnectFiveServer.serverSocket.close();
 
 	    try {
 	      // now that `serverSocket` is closed
@@ -41,30 +42,8 @@ public class ConnectFiveServerTest {
 	      assertEquals("Connection refused", e.getMessage().trim());
 	    }
 	  }
-
-	public class MockSocket extends Socket {
-		  // a mockSocket constructor does not need hostname and port number
-		  public MockSocket() {}
-
-		  // return an InputStream with a dummy request
-		  public InputStream getInputStream() {
-		    return new ByteArrayInputStream("GET / HTTP/1.1\nHost: localhost".getBytes());
-		  }
-
-		  // coming up next! :)
-		  public OutputStream getOutputStream() {
-		    return new OutputStream() {
-		      @Override
-		      public void write(int b) throws IOException {
-
-		      }
-		    };
-		  }
-		}
 	
 
-	
-	
-	
+
+
 }
-
